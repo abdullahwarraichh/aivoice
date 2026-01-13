@@ -1,11 +1,11 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, Loader2, RotateCcw, Save, Play, Pause, Download, Sparkles } from "lucide-react";
+import { EmptyState } from "@/components/ui-kit/empty-state";
+import { AlertCircle, Loader2, RotateCcw, Save, Play, Pause, Download, Sparkles, Mic2 } from "lucide-react";
 import { regenerateBlockAudio, saveDirectorNotes, generateAudioForChapter } from "@/actions/audio";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -222,70 +222,66 @@ export function StudioTab({
 
     if (!chapter) {
         return (
-            <Card>
-                <CardContent className="py-16 text-center">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted mx-auto">
-                        <AlertCircle className="h-10 w-10 text-muted-foreground" />
-                    </div>
-                    <h3 className="mt-6 text-lg font-semibold">No chapter selected</h3>
-                    <p className="mt-2 text-sm text-muted-foreground max-w-sm mx-auto">
-                        Select a chapter to start generating audio.
-                    </p>
-                </CardContent>
-            </Card>
+            <div className="surface-elevated">
+                <EmptyState
+                    icon={<AlertCircle className="h-12 w-12 text-muted-foreground" />}
+                    title="No chapter selected"
+                    description="Select a chapter from the Manuscript tab to start generating audio."
+                    helpLink="/help"
+                />
+            </div>
         );
     }
 
     if (projectStatus === "analyzing") {
         return (
-            <Card>
-                <CardContent className="py-16 text-center">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted mx-auto">
-                        <AlertCircle className="h-10 w-10 text-muted-foreground" />
+            <div className="surface-elevated">
+                <div className="p-12 text-center space-y-4">
+                    <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
+                        <Loader2 className="h-8 w-8 text-primary animate-spin" />
                     </div>
-                    <h3 className="mt-6 text-lg font-semibold">Analysis in progress</h3>
-                    <p className="mt-2 text-sm text-muted-foreground max-w-sm mx-auto">
+                    <h3 className="text-title text-foreground">Analysis in progress</h3>
+                    <p className="text-body text-muted-foreground max-w-md mx-auto">
                         Your chapter is being analyzed. This usually takes a minute or two.
                     </p>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
         );
     }
 
     if (allBlocks.length === 0) {
         return (
-            <Card>
-                <CardContent className="py-16 text-center">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted mx-auto">
-                        <AlertCircle className="h-10 w-10 text-muted-foreground" />
-                    </div>
-                    <h3 className="mt-6 text-lg font-semibold">No text blocks yet</h3>
-                    <p className="mt-2 text-sm text-muted-foreground max-w-sm mx-auto">
-                        Run analysis on this chapter first.
-                    </p>
-                </CardContent>
-            </Card>
+            <div className="surface-elevated">
+                <EmptyState
+                    icon={<AlertCircle className="h-12 w-12 text-muted-foreground" />}
+                    title="No text blocks yet"
+                    description="Review your manuscript in the Manuscript tab to detect characters and dialogue."
+                    helpLink="/help"
+                />
+            </div>
         );
     }
 
     // Show "Generate All Audio" prompt if no audio exists
     if (hasNoAudio) {
         return (
-            <Card>
-                <CardContent className="py-16 text-center">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 mx-auto">
+            <div className="surface-elevated">
+                <div className="p-12 text-center space-y-6">
+                    <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
                         <Sparkles className="h-10 w-10 text-primary" />
                     </div>
-                    <h3 className="mt-6 text-lg font-semibold">Ready to Generate Audio</h3>
-                    <p className="mt-2 text-sm text-muted-foreground max-w-sm mx-auto">
-                        Your manuscript has been analyzed and voices are assigned.
-                        Click the button below to generate audio for all {allBlocks.length} blocks.
-                    </p>
+                    <div className="space-y-2">
+                        <h3 className="text-headline text-foreground">Ready to Generate Audio</h3>
+                        <p className="text-body text-muted-foreground max-w-md mx-auto">
+                            Your manuscript has been analyzed and voices are assigned.
+                            Click the button below to generate audio for all {allBlocks.length} blocks.
+                        </p>
+                    </div>
                     <Button
                         onClick={handleGenerateAllAudio}
                         disabled={isGeneratingAll}
                         size="lg"
-                        className="mt-6 gap-2"
+                        className="gap-2"
                     >
                         {isGeneratingAll ? (
                             <>
@@ -299,23 +295,23 @@ export function StudioTab({
                             </>
                         )}
                     </Button>
-                    <p className="mt-4 text-xs text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                         This may take a few minutes depending on chapter length
                     </p>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
         );
     }
 
     return (
         <div className="grid grid-cols-2 gap-4 h-[calc(100vh-300px)]">
             {/* Left: Text Blocks List */}
-            <Card className="flex flex-col">
-                <CardContent className="p-4 flex-1 overflow-hidden flex flex-col">
+            <div className="surface flex flex-col">
+                <div className="p-4 flex-1 overflow-hidden flex flex-col">
                     <div className="mb-4">
                         <div className="flex items-center justify-between mb-2">
                             <div>
-                                <h3 className="font-semibold">Text Blocks</h3>
+                                <h3 className="text-title text-foreground">Text Blocks</h3>
                                 <p className="text-sm text-muted-foreground">
                                     {allBlocks.length} blocks • {blocksWithAudio.length} with audio
                                 </p>
@@ -374,7 +370,7 @@ export function StudioTab({
                             </div>
                         </div>
                     </div>
-                    <div className="flex-1 overflow-y-auto space-y-2 pr-2">
+                    <div className="flex-1 overflow-y-auto space-y-2 pr-2 scrollbar-custom">
                         {allBlocks.map((block) => (
                             <div
                                 key={block.id}
@@ -383,9 +379,9 @@ export function StudioTab({
                                     "p-3 rounded-lg border cursor-pointer transition-all hover:border-primary/50",
                                     selectedBlock?.id === block.id
                                         ? "border-primary bg-primary/5"
-                                        : "border-border bg-card",
+                                        : "border-border bg-background",
                                     currentPlayingBlockId === block.id &&
-                                    "ring-2 ring-green-500 bg-green-500/10 animate-pulse"
+                                    "ring-2 ring-green-500 bg-green-500/10"
                                 )}
                             >
                                 <div className="flex items-start gap-2 mb-2">
@@ -420,12 +416,12 @@ export function StudioTab({
                             </div>
                         ))}
                     </div>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
 
             {/* Right: Audio Player */}
-            <Card className="flex flex-col">
-                <CardContent className="p-6 flex-1 flex flex-col">
+            <div className="surface flex flex-col">
+                <div className="p-6 flex-1 flex flex-col">
                     {!selectedBlock ? (
                         <div className="flex-1 flex items-center justify-center text-center">
                             <div>
@@ -567,8 +563,8 @@ export function StudioTab({
                             </div>
                         </div>
                     )}
-                </CardContent>
-            </Card>
+                </div>
+            </div>
         </div>
     );
 }
